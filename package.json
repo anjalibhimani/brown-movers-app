@@ -1,0 +1,32 @@
+{
+    "name": "brown-movers-fullstack",
+    "version": "1.0.0",
+    "description": "Brown University peer-to-peer moving assistance platform",
+    "scripts": {
+        "install:all": "npm run install:frontend && npm run install:backend",
+        "install:frontend": "cd frontend && npm install",
+        "install:backend": "cd backend && pip install -r requirements.txt",
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev:backend": "cd backend && python app.py",
+        "start:frontend": "cd frontend && npm start",
+        "start:backend": "cd backend && python app.py",
+        "build:frontend": "cd frontend && npm run build",
+        "setup:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+        "setup:db": "cd backend && python init_db.py",
+        "test:frontend": "cd frontend && npm test",
+        "lint:frontend": "cd frontend && npm run lint"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.0"
+    },
+    "keywords": [
+        "brown-university",
+        "moving",
+        "flask",
+        "nextjs",
+        "fullstack"
+    ],
+    "author": "Anjali Bhimani",
+    "license": "MIT"
+}
