@@ -9,10 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
+    "@tailwindcss/postcss": "^4.1.11",
+    "axios": "^1.x",
     "next": "14.x",
-    "axios": "^1.x"
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
