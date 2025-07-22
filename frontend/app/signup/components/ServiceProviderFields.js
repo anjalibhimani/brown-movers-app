@@ -1,4 +1,4 @@
-export default function ServiceProviderFields({ formData, handleChange, handleServiceChange }) {
+export default function ServiceProviderFields({ formData, handleChange, handleServiceChange, handleFileChange }) {
   return (
     <div>
       <h3>Service Provider Details</h3>
@@ -22,6 +22,10 @@ export default function ServiceProviderFields({ formData, handleChange, handleSe
       <div>
         <label htmlFor="thirtyMinRate">30-Minute Rate ($):</label>
         <input type="number" id="thirtyMinRate" name="thirtyMinRate" step="0.01" min="0" value={formData.thirtyMinRate} onChange={handleChange} required={formData.isServiceProvider} />
+      </div>
+      <div>
+        <label htmlFor="profilePicture">Profile Picture:</label>
+        <input type="file" id="profilePicture" name="profilePicture" accept="image/*" onChange={handleFileChange} />
       </div>
     </div>
   );
