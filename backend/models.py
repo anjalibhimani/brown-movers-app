@@ -13,6 +13,8 @@ class User(db.Model):
     hourly_rate = db.Column(db.Float, default=0.0)
     thirty_min_rate = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_picture = db.Column(db.String(255), nullable=True)  # New field for profile picture
+
 
     def to_dict(self):
         return {
@@ -24,5 +26,6 @@ class User(db.Model):
             'is_service_provider': self.is_service_provider,
             'services_offered': self.services_offered,
             'hourly_rate': self.hourly_rate,
-            'thirty_min_rate': self.thirty_min_rate
+            'thirty_min_rate': self.thirty_min_rate,
+            'profile_picture': self.profile_picture 
         }
