@@ -14,6 +14,7 @@ class User(db.Model):
     thirty_min_rate = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_picture = db.Column(db.String(255), nullable=True)  # New field for profile picture
+    phone_number = db.Column(db.String(20), nullable=True)
 
 
     def to_dict(self):
@@ -27,5 +28,6 @@ class User(db.Model):
             'services_offered': self.services_offered,
             'hourly_rate': self.hourly_rate,
             'thirty_min_rate': self.thirty_min_rate,
-            'profile_picture': self.profile_picture 
+            'profile_picture': self.profile_picture,
+            'phone_number': self.phone_number 
         }
