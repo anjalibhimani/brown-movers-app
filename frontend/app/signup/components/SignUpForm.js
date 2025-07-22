@@ -16,6 +16,8 @@ export default function SignUpForm({ onSubmit, error, loading }) {
     thirtyMinRate: 0.0,
   });
 
+  const [profilePicture, setProfilePicture] = useState(null);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -44,9 +46,27 @@ export default function SignUpForm({ onSubmit, error, loading }) {
     });
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePicture(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => data.append(key, v));
+      } else {
+        data.append(key, value);
+      }
+    });
+    if (profilePicture) {
+      data.append('profilePicture', profilePicture);
+    }
+    onSubmit(data);
   };
 
   const currentYear = new Date().getFullYear();
@@ -92,6 +112,7 @@ export default function SignUpForm({ onSubmit, error, loading }) {
           formData={formData} 
           handleChange={handleChange} 
           handleServiceChange={handleServiceChange} 
+          handleFileChange={handleFileChange}
         />
       )}
       {error && <p style={{ color: 'red' }}>{error}</p>}
