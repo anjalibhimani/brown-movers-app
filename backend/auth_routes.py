@@ -3,12 +3,22 @@ from models import db, User
 from extensions import bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    if request.content_type and request.content_type.startswith('multipart/form-data'):
+        data = request.form
+        file = request.files.get('profilePicture')
+    else:
+        data = request.get_json()
+        file = None
     email = data.get('email')
     password = data.get('password')
     first_name = data.get('firstName')
@@ -19,6 +29,17 @@ def register():
     hourly_rate = data.get('hourlyRate', 0.0)
     thirty_min_rate = data.get('thirtyMinRate', 0.0)
 
+    if isinstance(is_service_provider, str):
+        is_service_provider = is_service_provider.lower() == 'true'
+    if isinstance(services_offered, str):
+        services_offered = [services_offered]
+    if isinstance(hourly_rate, str):
+        hourly_rate = float(hourly_rate)
+    if isinstance(thirty_min_rate, str):
+        thirty_min_rate = float(thirty_min_rate)
+    if isinstance(graduation_year, str):
+        graduation_year = int(graduation_year)
+
     if not all([email, password, first_name, last_name, graduation_year]):
         return jsonify({"msg": "Missing required fields"}), 400
 
@@ -26,6 +47,12 @@ def register():
         return jsonify({"msg": "User with that email already exists"}), 409
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    profile_picture_filename = None
+    if file:
+        filename = secure_filename(file.filename)
+        profile_picture_filename = filename
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
 
     new_user = User(
         email=email,
@@ -36,7 +63,8 @@ def register():
         is_service_provider=is_service_provider,
         services_offered=services_offered if is_service_provider else [],
         hourly_rate=hourly_rate if is_service_provider else 0.0,
-        thirty_min_rate=thirty_min_rate if is_service_provider else 0.0
+        thirty_min_rate=thirty_min_rate if is_service_provider else 0.0,
+        profile_picture=profile_picture_filename
     )
 
     db.session.add(new_user)
@@ -60,3 +88,25 @@ def login():
         return jsonify(access_token=access_token, user=user.to_dict()), 200
     else:
         return jsonify({"msg": "Bad email or password"}), 401
+
+@auth_bp.route('/movers', methods=['GET'])
+def get_movers():
+    movers = User.query.filter_by(is_service_provider=True).all()
+    result = [
+        {
+            'id': m.id,
+            'profile_picture': m.profile_picture,
+            'first_name': m.first_name,
+            'last_name': m.last_name,
+            'graduation_year': m.graduation_year
+        }
+        for m in movers
+    ]
+    return jsonify(result), 200
+
+@auth_bp.route('/movers/<int:user_id>', methods=['GET'])
+def get_mover_detail(user_id):
+    mover = User.query.filter_by(id=user_id, is_service_provider=True).first()
+    if not mover:
+        return jsonify({'msg': 'Mover not found'}), 404
+    return jsonify(mover.to_dict()), 200
