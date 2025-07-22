@@ -14,6 +14,7 @@ export default function SignUpForm({ onSubmit, error, loading }) {
     servicesOffered: [],
     hourlyRate: 0.0,
     thirtyMinRate: 0.0,
+    phoneNumber: '', 
   });
 
   const [profilePicture, setProfilePicture] = useState(null);
@@ -115,6 +116,10 @@ export default function SignUpForm({ onSubmit, error, loading }) {
           handleFileChange={handleFileChange}
         />
       )}
+      <div>
+        <label htmlFor="phoneNumber">Phone Number (optional):</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+      </div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <button type="submit" disabled={loading}>{loading ? 'Registering...' : 'Sign Up'}</button>
     </form>
