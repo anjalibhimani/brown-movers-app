@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
 from models import db, User
 from extensions import bcrypt
 from flask_jwt_extended import create_access_token
@@ -28,6 +28,7 @@ def register():
     services_offered = data.get('servicesOffered', [])
     hourly_rate = data.get('hourlyRate', 0.0)
     thirty_min_rate = data.get('thirtyMinRate', 0.0)
+    phone_number = data.get('phoneNumber')
 
     if isinstance(is_service_provider, str):
         is_service_provider = is_service_provider.lower() == 'true'
@@ -64,7 +65,8 @@ def register():
         services_offered=services_offered if is_service_provider else [],
         hourly_rate=hourly_rate if is_service_provider else 0.0,
         thirty_min_rate=thirty_min_rate if is_service_provider else 0.0,
-        profile_picture=profile_picture_filename
+        profile_picture=profile_picture_filename,
+        phone_number=phone_number
     )
 
     db.session.add(new_user)
