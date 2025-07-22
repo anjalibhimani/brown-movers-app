@@ -110,3 +110,7 @@ def get_mover_detail(user_id):
     if not mover:
         return jsonify({'msg': 'Mover not found'}), 404
     return jsonify(mover.to_dict()), 200
+
+@auth_bp.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
