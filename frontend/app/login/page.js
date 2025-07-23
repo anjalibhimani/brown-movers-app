@@ -1,5 +1,8 @@
-// Login page component that handles user authentication, token storage, and navigation to dashboard
-// Manages login API calls, error handling, and passes state down to LoginForm component
+/**
+ * main page component for user login, handles login state, API reqs, and loginForm component called 
+ *
+ * @returns {JSX.Element} - the rendered login page
+ */
 
 'use client';
 import { useState } from 'react';
@@ -18,7 +21,8 @@ export default function LoginPage() {
 
   /**
    * handles login form submission
-   * @param {Object} loginData - the email and password from form on the app
+   * @param {Object} loginData - user's login credentials so email and password from form on the app
+   * @returns {Promise<void>}
    **/
   
   async function handleLogin(loginData) {
@@ -62,7 +66,7 @@ export default function LoginPage() {
     <div>
       <h2>Login to Your Account</h2>
       {/* calls on the handleLogin function when login form submitted, pass down the error and loading states */}
-      <LoginForm onSubmit={handleLogin} error={error} loading={loading} />
+      <LoginForm onLogin={handleLogin} error={error} loading={loading} />
 
       {/* option to click on singup to take user to sign up page if they don't have an account */}
       <p>Don't have an account? <a href="/signup">Sign Up</a></p>
