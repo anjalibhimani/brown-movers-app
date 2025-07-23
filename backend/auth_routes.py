@@ -90,6 +90,16 @@ def login():
         return jsonify(access_token=access_token, user=user.to_dict()), 200
     else:
         return jsonify({"msg": "Bad email or password"}), 401
+
+@auth_bp.route('/user', methods=['GET'])
+@jwt_required()
+def get_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+    return jsonify(user.to_dict()), 200
+    
 @auth_bp.route('/user/update', methods=['PUT'])
 @jwt_required()
 def update_user():
@@ -139,15 +149,6 @@ def update_user():
     db.session.commit()
 
     return jsonify({"msg": "User updated successfully", "user": user.to_dict()}), 200
-
-@auth_bp.route('/user', methods=['GET'])
-@jwt_required()
-def get_user():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'msg': 'User not found'}), 404
-    return jsonify(user.to_dict()), 200
     
 @auth_bp.route('/movers', methods=['GET'])
 def get_movers():
