@@ -90,7 +90,65 @@ def login():
         return jsonify(access_token=access_token, user=user.to_dict()), 200
     else:
         return jsonify({"msg": "Bad email or password"}), 401
+@auth_bp.route('/user/update', methods=['PUT'])
+@jwt_required()
+def update_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
 
+    if request.content_type and request.content_type.startswith('multipart/form-data'):
+        data = request.form
+        file = request.files.get('profilePicture')
+    else:
+        data = request.get_json()
+        file = None
+
+    user.email = data.get('email', user.email)
+    user.first_name = data.get('firstName', user.first_name)
+    user.last_name = data.get('lastName', user.last_name)
+    user.graduation_year = data.get('graduationYear', user.graduation_year)
+    user.phone_number = data.get('phoneNumber', user.phone_number)
+    
+    is_service_provider = data.get('isServiceProvider', user.is_service_provider)
+    if isinstance(is_service_provider, str):
+        user.is_service_provider = is_service_provider.lower() == 'true'
+    else:
+        user.is_service_provider = is_service_provider
+
+
+    if user.is_service_provider:
+        services_offered = data.get('servicesOffered', user.services_offered)
+        if isinstance(services_offered, str):
+            user.services_offered = [services_offered]
+        else:
+            user.services_offered = services_offered
+        user.hourly_rate = float(data.get('hourlyRate', user.hourly_rate))
+        user.thirty_min_rate = float(data.get('thirtyMinRate', user.thirty_min_rate))
+    else:
+        user.services_offered = []
+        user.hourly_rate = 0.0
+        user.thirty_min_rate = 0.0
+
+    if file:
+        filename = secure_filename(file.filename)
+        user.profile_picture = filename
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+    db.session.commit()
+
+    return jsonify({"msg": "User updated successfully", "user": user.to_dict()}), 200
+
+@auth_bp.route('/user', methods=['GET'])
+@jwt_required()
+def get_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+    return jsonify(user.to_dict()), 200
+    
 @auth_bp.route('/movers', methods=['GET'])
 def get_movers():
     movers = User.query.filter_by(is_service_provider=True).all()
