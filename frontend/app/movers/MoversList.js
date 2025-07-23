@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import MoverCard from "./MoverCard";
-import MoverDetailModal from "./MoverDetailModal";
 
 export default function MoversList() {
   const [movers, setMovers] = useState([]);
-  const [selectedMover, setSelectedMover] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,15 +14,6 @@ export default function MoversList() {
       .catch((err) => setError("Failed to load movers."))
       .finally(() => setLoading(false));
   }, []);
-
-  const handleCardClick = (id) => {
-    fetch(`/api/auth/movers/${id}`)
-      .then((res) => res.json())
-      .then(setSelectedMover)
-      .catch(() => setError("Failed to load mover details."));
-  };
-
-  const closeModal = () => setSelectedMover(null);
 
   if (loading) return <div>Loading movers...</div>;
   if (error) return <div>{error}</div>;
@@ -40,12 +29,9 @@ export default function MoversList() {
         }}
       >
         {movers.map((mover) => (
-          <MoverCard key={mover.id} mover={mover} onClick={() => handleCardClick(mover.id)} />
+          <MoverCard key={mover.id} mover={mover} />
         ))}
       </div>
-      {selectedMover && (
-        <MoverDetailModal mover={selectedMover} onClose={closeModal} />
-      )}
     </div>
   );
 }
