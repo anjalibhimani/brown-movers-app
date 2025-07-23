@@ -6,19 +6,30 @@ from datetime import timedelta
 import os
 from werkzeug.utils import secure_filename
 
+# define folder to store the mover's uploaded photo file for their profile (fallback make the directory if cannot find)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# create a Flask bluebrint to modularize 
 auth_bp = Blueprint('auth', __name__)
+
+"""
+    this route deals with new user registration by processing the form submission data and optional picture, and creates the user in database 
+
+    @return {Response} - a JSON object with a success message and user_id, or if an issue occurs then an error message
+"""
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    # check to see if the request has file-type data from the profile pic, if not then request body is normal JSON 
     if request.content_type and request.content_type.startswith('multipart/form-data'):
         data = request.form
         file = request.files.get('profilePicture')
     else:
         data = request.get_json()
         file = None
+
+    # extract the user's profile data from data dict, if missing set the default value for the optional fields
     email = data.get('email')
     password = data.get('password')
     first_name = data.get('firstName')
@@ -30,10 +41,15 @@ def register():
     thirty_min_rate = data.get('thirtyMinRate', 0.0)
     phone_number = data.get('phoneNumber')
 
+    # convert strings from the form to boolean vars 
     if isinstance(is_service_provider, str):
         is_service_provider = is_service_provider.lower() == 'true'
+    
+    # set the services offered by the user as a list
     if isinstance(services_offered, str):
         services_offered = [services_offered]
+
+    # convert form numbers to ints and floats
     if isinstance(hourly_rate, str):
         hourly_rate = float(hourly_rate)
     if isinstance(thirty_min_rate, str):
@@ -41,20 +57,25 @@ def register():
     if isinstance(graduation_year, str):
         graduation_year = int(graduation_year)
 
+    # confirm all mandatory fields from form were submitted 
     if not all([email, password, first_name, last_name, graduation_year]):
         return jsonify({"msg": "Missing required fields"}), 400
 
+    # cannot have multiple users with the same email register 
     if User.query.filter_by(email=email).first():
         return jsonify({"msg": "User with that email already exists"}), 409
 
+    # hash user password for data security 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
+    # clean file name and add to the folder if a pic was uploaded
     profile_picture_filename = None
     if file:
         filename = secure_filename(file.filename)
         profile_picture_filename = filename
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
+    # create new User instance for this user with their data 
     new_user = User(
         email=email,
         password_hash=hashed_password,
@@ -69,45 +90,77 @@ def register():
         phone_number=phone_number
     )
 
+    # add and commit this user instance to the database 
     db.session.add(new_user)
     db.session.commit()
 
+    # success message for dev stage
     return jsonify({"msg": "User registered successfully", "user_id": new_user.id}), 201
+
+"""
+    this route deals with authentication for when a user wants to login
+
+    @return {Response} - a JSON object with an access token and the user's account data, or if issue occurs then error message
+"""
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    # extract email and password fields from user's submission
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
 
+    # if one of either fields is missing, error cannot login 
     if not all([email, password]):
         return jsonify({"msg": "Missing email or password"}), 400
 
+    # search for the user un the database based on their email
     user = User.query.filter_by(email=email).first()
 
+    # verify user was found, and that the password matches the account, if not then error message
     if user and bcrypt.check_password_hash(user.password_hash, password):
+        # create a JSON Web Token access token with user's ID, and return the user's data 
         access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))
         return jsonify(access_token=access_token, user=user.to_dict()), 200
     else:
         return jsonify({"msg": "Bad email or password"}), 401
 
+ """
+    this route deals with fetching the profile data for the user who has logged in, 
+    only processes request if valid authorization header with token with the secret key 
+
+    @return {Response} - a JSON object with the user's data, or the user not found error 
+"""
+
 @auth_bp.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
+    # extract user id from token, and search for user in the databse... if not found error, if found then return object as dictionary
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if not user:
         return jsonify({'msg': 'User not found'}), 404
     return jsonify(user.to_dict()), 200
-    
+
+
+"""
+    this route deals with updating the profile for the logged in user, 
+    needs valid authorization header with token with the secret key  
+
+    @return {Response} - a JSON object with a message indicating successful completion and the updated user data, 
+                        or an error is an issue occurs.
+"""
+
 @auth_bp.route('/user/update', methods=['PUT'])
 @jwt_required()
 def update_user():
+    # extract user id from token, search for user in databse... if not found error
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if not user:
         return jsonify({'msg': 'User not found'}), 404
 
+    # based on if pic was uploaded or not handle the requests seperately
     if request.content_type and request.content_type.startswith('multipart/form-data'):
         data = request.form
         file = request.files.get('profilePicture')
@@ -115,19 +168,21 @@ def update_user():
         data = request.get_json()
         file = None
 
+    # update the fields with the new data if user updated it, if not then keep original
     user.email = data.get('email', user.email)
     user.first_name = data.get('firstName', user.first_name)
     user.last_name = data.get('lastName', user.last_name)
     user.graduation_year = data.get('graduationYear', user.graduation_year)
     user.phone_number = data.get('phoneNumber', user.phone_number)
-    
+
+    # if isServiceProvider info collected and user is a mover now, then convert to boolean, else just use original value
     is_service_provider = data.get('isServiceProvider', user.is_service_provider)
     if isinstance(is_service_provider, str):
         user.is_service_provider = is_service_provider.lower() == 'true'
     else:
         user.is_service_provider = is_service_provider
 
-
+    # if the user is a mover, then try to update mover data where changes were made in the form 
     if user.is_service_provider:
         services_offered = data.get('servicesOffered', user.services_offered)
         if isinstance(services_offered, str):
@@ -136,22 +191,25 @@ def update_user():
             user.services_offered = services_offered
         user.hourly_rate = float(data.get('hourlyRate', user.hourly_rate))
         user.thirty_min_rate = float(data.get('thirtyMinRate', user.thirty_min_rate))
+    
+    # if user is not a mover anymore then reset those fields
     else:
         user.services_offered = []
         user.hourly_rate = 0.0
         user.thirty_min_rate = 0.0
 
+    # update the user's photo if uploaded new one and exists
     if file:
         filename = secure_filename(file.filename)
         user.profile_picture = filename
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
+    # push all changes to the database and return a successful message indicator 
     db.session.commit()
-
     return jsonify({"msg": "User updated successfully", "user": user.to_dict()}), 200
     
-@auth_bp.route('/movers', methods=['GET'])
-def get_movers():
+@auth_bp.route('/movers/<int:user_id>', methods=['GET'])
+def get_mover_detail(user_id):
     movers = User.query.filter_by(is_service_provider=True).all()
     result = [
         {
@@ -165,12 +223,52 @@ def get_movers():
     ]
     return jsonify(result), 200
 
+"""
+    this route deals with feteching all the users who are movers 
+
+    @return {Response} - a JSON array of mover(user) summary objects for their cards
+"""
+
+@auth_bp.route('/movers', methods=['GET'])
+def get_movers():
+    # search for all users who are listed as moving or packing helpers
+    movers = User.query.filter_by(is_service_provider=True).all()
+    # summarize basic info to later make the mover cards
+    result = [
+        {
+            'id': m.id,
+            'profile_picture': m.profile_picture,
+            'first_name': m.first_name,
+            'last_name': m.last_name,
+            'graduation_year': m.graduation_year
+        }
+        for m in movers
+    ]
+    return jsonify(result), 200
+
+"""
+    this route deals with fetching the detailed data for a specific mover/packer 
+
+    @param {int} user_id - the id of the mover the user is trying to view details for
+    @return {Response} - a JSON object with the mover's full profile data, or if an issue occures then an error 
+"""
+
 @auth_bp.route('/movers/<int:user_id>', methods=['GET'])
 def get_mover_detail(user_id):
+    # search all users with the id being looked for who are movers
     mover = User.query.filter_by(id=user_id, is_service_provider=True).first()
+    
+    # if mover not found then error, else return their data dict
     if not mover:
         return jsonify({'msg': 'Mover not found'}), 404
     return jsonify(mover.to_dict()), 200
+
+"""
+    this route serves the profile picture from the UPLOAD_FOLDER folder 
+
+    @param {string} filename - the name of the file to be found
+    @return {Response} - the file being retrieved
+"""
 
 @auth_bp.route('/uploads/<filename>')
 def uploaded_file(filename):
