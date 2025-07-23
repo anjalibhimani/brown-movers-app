@@ -1,10 +1,20 @@
+# display welcome page for logged-in users with links to view all movers, upadete profile, etc
+
 import Link from 'next/link';
+
+/**
+ * renders main dashboard page for user once logged in, and provides links to navigate to other pages in the web app
+ *
+ * @returns {JSX.Element} - the rendered dashboard component
+ */
 
 export default function Dashboard() {
     return (
       <div>
         <h1>Welcome to your Dashboard!</h1>
         <p>You are logged in.</p>
+    
+        {/* link that takes user to page to view all registered movers*/}
         <Link href="/movers" legacyBehavior>
           <a style={{
             display: 'inline-block',
@@ -21,6 +31,8 @@ export default function Dashboard() {
             View Movers
           </a>
         </Link>
+        
+        {/* link that takes user to page where they can update their profile info */}
         <Link href="/profile/update" legacyBehavior>
           <a style={{
             display: 'inline-block',
