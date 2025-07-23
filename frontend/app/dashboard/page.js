@@ -21,6 +21,23 @@ export default function Dashboard() {
             View Movers
           </a>
         </Link>
+        <Link href="/profile/update" legacyBehavior>
+          <a style={{
+            display: 'inline-block',
+            marginTop: 24,
+            marginLeft: 16,
+            padding: '12px 32px',
+            background: '#f59e0b',
+            color: '#fff',
+            borderRadius: 8,
+            fontWeight: 600,
+            textDecoration: 'none',
+            fontSize: 18,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+          }}>
+            Update Profile
+          </a>
+        </Link>
       </div>
     );
   }
