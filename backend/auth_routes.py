@@ -1,3 +1,5 @@
+# defines all the API endpoints for steps like registering, logging in, updating your profile, getting to see all the movers, etc
+
 from flask import Blueprint, request, jsonify, send_from_directory
 from models import db, User
 from extensions import bcrypt
