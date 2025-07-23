@@ -21,17 +21,22 @@ export default function MoversList() {
   return (
     <div style={{ padding: 24 }}>
       <h2>Available Movers</h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 24,
-        }}
-      >
-        {movers.map((mover) => (
-          <MoverCard key={mover.id} mover={mover} />
-        ))}
-      </div>
+      {movers.length === 0 ? (
+        // If it is, display a helpful message to the user.
+        <p>There are no movers available at the moment.</p>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 24,
+          }}
+        >
+          {movers.map((mover) => (
+            <MoverCard key={mover.id} mover={mover} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
