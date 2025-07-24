@@ -3,21 +3,33 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
+/**
+ * renders profile page for mover, dynamic route param 'id' from URl to get correct data for mover 
+ *
+ * @returns {JSX.Element} - rendered page for details about specified mover
+ */
+
 export default function MoverDetailPage() {
+  // states to store profile object of mover, track loading, and error message
   const [mover, setMover] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // extract id from URL
   const { id } = useParams();
 
+  // effect hook, fetches the specific mover's details, runs when id in URL changes 
   useEffect(() => {
     if (id) {
       fetch(`/api/auth/movers/${id}`)
         .then((res) => {
+          // if issue, then throw an error, else parse the JSON response
           if (!res.ok) {
             throw new Error('Mover not found');
           }
           return res.json();
         })
+        // store data in move state, store error message if exists, and stop loading if done
         .then(setMover)
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
@@ -30,6 +42,7 @@ export default function MoverDetailPage() {
 
   return (
     <div style={{ padding: 32, maxWidth: 600, margin: 'auto' }}>
+      {/* if mover has uploaded a pic, then render the file */}
       {mover.profile_picture && (
         <img
           src={`/api/auth/uploads/${mover.profile_picture}`}
@@ -37,6 +50,7 @@ export default function MoverDetailPage() {
           style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16 }}
         />
       )}
+      {/* display detailed info for specified mover */}
       <h1 style={{ margin: '0 0 8px' }}>{mover.first_name} {mover.last_name}</h1>
       <p>Class of {mover.graduation_year}</p>
       <div style={{ marginTop: 24 }}>
