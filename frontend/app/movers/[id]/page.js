@@ -41,19 +41,19 @@ export default function MoverDetailPage() {
   if (!mover) return <div>Mover not found.</div>
 
   return (
-    <div style={{ padding: 32, maxWidth: 600, margin: 'auto' }}>
+    <div className="p-8 max-w-2xl mx-auto">
       {/* if mover has uploaded a pic, then render the file */}
       {mover.profile_picture && (
         <img
           src={`/api/auth/uploads/${mover.profile_picture}`}
           alt="Profile"
-          style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16 }}
+          className="w-32 h-32 rounded-full object-cover mb-4"
         />
       )}
       {/* display detailed info for specified mover */}
-      <h1 style={{ margin: '0 0 8px' }}>{mover.first_name} {mover.last_name}</h1>
-      <p>Class of {mover.graduation_year}</p>
-      <div style={{ marginTop: 24 }}>
+      <h1 className="text-3xl font-bold mb-1">{mover.first_name} {mover.last_name}</h1>
+      <p className="text-lg text-gray-600">Class of {mover.graduation_year}</p>
+      <div className="mt-6 space-y-2">
         <p><strong>Email:</strong> {mover.email}</p>
         {mover.phone_number && <p><strong>Phone:</strong> {mover.phone_number}</p>}
         <p><strong>Hourly Rate:</strong> ${mover.hourly_rate}</p>
