@@ -87,22 +87,22 @@ export default function UpdateForm({ onSubmit, error, loading, initialData }) {
   const years = Array.from({ length: 10 }, (_, i) => currentYear + i);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-4">>
       <div>
-        <label htmlFor="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
+        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name:</label>
+        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
       </div>
       <div>
-        <label htmlFor="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
+        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
       </div>
       <div>
-        <label htmlFor="email">Brown Email:</label>
-        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Brown Email:</label>
+        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
       </div>
       <div>
-        <label htmlFor="graduationYear">Graduation Year:</label>
-        <select id="graduationYear" name="graduationYear" value={formData.graduationYear} onChange={handleChange} required>
+        <label htmlFor="graduationYear" className="block text-sm font-medium text-gray-700">Graduation Year:</label>
+        <select id="graduationYear" name="graduationYear" value={formData.graduationYear} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           <option value="">Select Year</option>
           {years.map(year => (
             <option key={year} value={year}>{year}</option>
@@ -110,8 +110,8 @@ export default function UpdateForm({ onSubmit, error, loading, initialData }) {
         </select>
       </div>
       <div>
-        <input type="checkbox" id="isServiceProvider" name="isServiceProvider" checked={formData.isServiceProvider} onChange={handleChange} />
-        <label htmlFor="isServiceProvider">I want to be a service provider (mover/packer)</label>
+        <input type="checkbox" id="isServiceProvider" name="isServiceProvider" checked={formData.isServiceProvider} onChange={handleChange} className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+        <label htmlFor="isServiceProvider" className="ml-2 block text-sm text-gray-900">I want to be a service provider (mover/packer)</label>
       </div>
       {formData.isServiceProvider && (
         <ServiceProviderFields 
@@ -122,11 +122,17 @@ export default function UpdateForm({ onSubmit, error, loading, initialData }) {
         />
       )}
       <div>
-        <label htmlFor="phoneNumber">Phone Number (optional):</label>
-        <input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+        label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number (optional):</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
       </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit" disabled={loading}>{loading ? 'Updating...' : 'Update Profile'}</button>
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:bg-yellow-300"
+      >
+        {loading ? 'Updating...' : 'Update Profile'}
+      </button>
     </form>
   );
 }
