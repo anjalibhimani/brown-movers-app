@@ -209,21 +209,6 @@ def update_user():
     # push all changes to the database and return a successful message indicator 
     db.session.commit()
     return jsonify({"msg": "User updated successfully", "user": user.to_dict()}), 200
-    
-@auth_bp.route('/movers/<int:user_id>', methods=['GET'])
-def get_mover_detail(user_id):
-    movers = User.query.filter_by(is_service_provider=True).all()
-    result = [
-        {
-            'id': m.id,
-            'profile_picture': m.profile_picture,
-            'first_name': m.first_name,
-            'last_name': m.last_name,
-            'graduation_year': m.graduation_year
-        }
-        for m in movers
-    ]
-    return jsonify(result), 200
 
 """
     this route deals with feteching all the users who are movers 
