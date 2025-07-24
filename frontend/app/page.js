@@ -12,44 +12,21 @@ import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   return (
-    <main style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      padding: 24
-    }}>
-      <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Welcome to Brown Movers</h1>
-      <p style={{ marginTop: 8, fontSize: '1.25rem', color: '#666' }}>
+    <main className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-50">
+      <h1 className="text-5xl font-bold text-gray-800">Welcome to Brown Movers</h1>
+      <p className="mt-2 text-xl text-gray-600">
         Your one-stop solution for moving and packing services at Brown University.
       </p>
-      <div style={{ marginTop: 32 }}>
-        {/* link to ogin page */}
+      <div className="mt-8">
+        {/* link to login page */}
         <Link href="/login" legacyBehavior>
-          <a style={{
-            margin: 8,
-            padding: '12px 24px',
-            background: '#3b82f6',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: 8,
-            fontWeight: 600
-          }}>
+          <a className="m-2 py-3 px-6 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors">
             Login
           </a>
         </Link>
         {/* link to sign-up page */}
         <Link href="/signup" legacyBehavior>
-          <a style={{
-            margin: 8,
-            padding: '12px 24px',
-            background: '#10b981',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: 8,
-            fontWeight: 600
-          }}>
+          <a className="m-2 py-3 px-6 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors">
             Sign Up
           </a>
         </Link>
