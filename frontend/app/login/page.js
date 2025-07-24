@@ -61,15 +61,20 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
-
+  
   return (
-    <div>
-      <h2>Login to Your Account</h2>
-      {/* calls on the handleLogin function when login form submitted, pass down the error and loading states */}
-      <LoginForm onLogin={handleLogin} error={error} loading={loading} />
-
-      {/* option to click on singup to take user to sign up page if they don't have an account */}
-      <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm">
+        <h2 className="text-2xl font-bold text-center mb-6">Login to Your Account</h2>
+        {/* calls on the handleLogin function when login form submitted, pass down the error and loading states */}
+        <LoginForm onLogin={handleLogin} error={error} loading={loading} />
+        <p className="mt-4 text-sm text-center text-gray-600">
+          Don't have an account? 
+          <a href="/signup" className="ml-1 font-medium text-blue-600 hover:text-blue-500">
+            Sign Up
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
