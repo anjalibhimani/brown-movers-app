@@ -31,32 +31,40 @@ export default function LoginForm({ onLogin, error, loading }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* email and password input fields for user, with types to ensure emails and passwords are being entered */}
       <div>
-        <label htmlFor="email">Email:</label>
-        <input 
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email:
+        </label>
+        <input
           type="email" 
           id="email" 
           value={email} 
           onChange={e => setEmail(e.target.value)} 
           required 
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
       <div>
-        <label htmlFor="password">Password:</label>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          Password:
+        </label>
         <input 
           type="password" 
           id="password" 
           value={password} 
           onChange={e => setPassword(e.target.value)} 
           required 
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
       {/* display potential login error message */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {/* disable submit button while system processing the login request */}
-      <button type="submit" disabled={loading}>
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
+      >
         {loading ? 'Logging In...' : 'Login'}
       </button>
     </form>
