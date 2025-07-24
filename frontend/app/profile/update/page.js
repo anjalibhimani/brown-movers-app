@@ -61,18 +61,20 @@ export default function UpdateProfilePage() {
   };
   
   if (!userData) {
-    return <div>Loading profile...</div>;
+    return<div className="p-8">Loading profile...</div>;
   }
 
   return (
-    <div>
-      <h2>Update Your Profile</h2>
-      <UpdateForm
-        onSubmit={handleUpdate}
-        error={error}
-        loading={loading}
-        initialData={userData}
-      />
+    <div className="flex flex-col items-center justify-center min-h-screen py-10 bg-gray-50">
+      <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
+        <h2 className="text-2xl font-bold text-center mb-6">Update Your Profile</h2>
+        <UpdateForm
+          onSubmit={handleUpdate}
+          error={error}
+          loading={loading}
+          initialData={userData}
+        />
+      </div>
     </div>
   );
 }
