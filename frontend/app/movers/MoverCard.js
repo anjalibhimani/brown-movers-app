@@ -13,34 +13,22 @@ export default function MoverCard({ mover }) {
   return (
     // reference link to page based on the mover's id
     <Link href={`/movers/${mover.id}`} passHref>
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: 8,
-          padding: 16,
-          cursor: "pointer",
-          background: "#fff",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          textAlign: "center",
-          textDecoration: 'none',
-          color: 'inherit'
-        }}
-      >
+      <div className="border border-gray-200 rounded-lg p-4 cursor-pointer bg-white shadow-sm hover:shadow-lg transition-shadow text-center">
       {/* if file/pic exists, then render the pic else just have a placeholder*/}
         {mover.profile_picture ? (
           <img
             src={`/api/auth/uploads/${mover.profile_picture}`}
             alt="Profile"
-            style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", marginBottom: 8 }}
+            className="w-20 h-20 rounded-full object-cover mb-2 mx-auto"
           />
         ) : (
-          <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#eee", margin: "0 auto 8px" }} />
+          <div className="w-20 h-20 rounded-full bg-gray-200 mb-2 mx-auto" />
         )}
         {/* show mover's full name and grad year */}
-        <div style={{ fontWeight: 600, fontSize: 18 }}>
+        <div className="font-semibold text-lg">
           {mover.first_name} {mover.last_name}
         </div>
-        <div>Class of {mover.graduation_year}</div>
+        <div className="text-gray-600">Class of {mover.graduation_year}</div>
       </div>
     </Link>
   );
