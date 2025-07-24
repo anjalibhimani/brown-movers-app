@@ -127,7 +127,7 @@ def login():
     else:
         return jsonify({"msg": "Bad email or password"}), 401
 
- """
+"""
     this route deals with fetching the profile data for the user who has logged in, 
     only processes request if valid authorization header with token with the secret key 
 
