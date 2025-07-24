@@ -61,9 +61,14 @@ export default function SignUpPage() {
     <div className="flex flex-col items-center justify-center min-h-screen py-10 bg-gray-50">
       <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center mb-6">Create Your Account</h2>
-        {/* render SignUpForm component, pass handler and states as props
-        */}
+        {/* render SignUpForm component, pass handler and states as props */}
         <SignUpForm onSubmit={handleSignUp} error={error} loading={loading} />
+          <p className="mt-4 text-sm text-center text-gray-600">
+          Already have an account?
+          <a href="/login" className="ml-1 font-medium text-blue-600 hover:text-blue-500">
+          Login
+          </a>
+        </p>
       </div>
     </div>
   );
