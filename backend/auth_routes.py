@@ -7,6 +7,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from datetime import timedelta
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
+from .models import Availability # Make sure to import the new model
 
 # define folder to store the mover's uploaded photo file for their profile (fallback make the directory if cannot find)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
@@ -245,11 +247,99 @@ def get_mover_detail(user_id):
     # search all users with the id being looked for who are movers
     mover = User.query.filter_by(id=user_id, is_service_provider=True).first()
     
-    # if mover not found then error, else return their data dict
+    # if mover not found then error, else return their data dict, and fetch their availability slots to add to their final data 
     if not mover:
         return jsonify({'msg': 'Mover not found'}), 404
-    return jsonify(mover.to_dict()), 200
 
+    mover_data = mover.to_dict()
+    availabilities = Availability.query.filter_by(user_id=user_id).order_by(Availability.start_time).all()
+    mover_data['availabilities'] = [a.to_dict() for a in availabilities]
+    return jsonify(mover_data), 200 
+
+"""
+    this route deals with adding a new availability slot for the logged-in mover right now
+
+    @return {Response} - a JSON object with the message with success or error with the corresponding status code   
+"""
+
+@auth_bp.route('/user/availability', methods=['POST'])
+@jwt_required()
+def add_availability():
+    # extract the user ID from JSON Web Token, and retrieve user data from databse
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    # if it happens that a non mover accessed this because of issues, then prevent inform them they must be a mover
+    if not user or not user.is_service_provider:
+        return jsonify({"msg": "Only service providers can add availability"}), 403
+
+    # retrieve slot start and end times
+    data = request.get_json()
+    start_time_str = data.get('start_time')
+    end_time_str = data.get('end_time')
+
+    if not start_time_str or not end_time_str:
+        return jsonify({"msg": "Missing start_time or end_time"}), 400
+
+    # conversion to a  datetime object
+    start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00')) 
+    end_time = datetime.fromisoformat(end_time_str.replace('Z', '+00:00'))
+
+    # create the new slot the mover added, and add this to the database
+    new_slot = Availability(user_id=user_id, start_time=start_time, end_time=end_time)
+    db.session.add(new_slot)
+    db.session.commit()
+
+    # return the slot and message to confirm it is good 
+    return jsonify({"msg": "Availability added successfully", "availability": new_slot.to_dict()}), 201
+
+"""
+    this route deals with fetching all available slots for a specific mover
+
+    @param {int} user_id - the ID of the mover person
+    @return {Response} - a JSON array of availability slots if no error, else a JSON object with an error message
+"""
+
+@auth_bp.route('/movers/<int:user_id>/availability', methods=['GET'])
+def get_availability(user_id):
+    # find the mover based on the id provided
+    user = User.query.get(user_id)
+
+    # if the mover is not found error, else return their slots  
+    if not user or not user.is_service_provider:
+        return jsonify({"msg": "Mover not found"}), 404
+    
+    slots = Availability.query.filter_by(user_id=user_id).all()
+    return jsonify([slot.to_dict() for slot in slots]), 200
+
+
+"""
+    this route deals with deleting an availability slot for the logged-in mover.
+
+    @param {int} slot_id - the ID of the slot that needs to be deleted
+    @return {Response} - a JSON object with the message with success or error with the corresponding status code   
+"""
+
+@auth_bp.route('/user/availability/<int:slot_id>', methods=['DELETE'])
+@jwt_required()
+def delete_availability(slot_id):
+    # extract the user ID from JSON Web Token, and get the time slot being deleted from database
+    user_id = get_jwt_identity()
+    slot = Availability.query.get(slot_id)
+
+    # if the user id in the slot doesnt match or slot is not existing, then error
+    if not slot:
+        return jsonify({"msg": "Availability slot not found"}), 404
+
+    if slot.user_id != user_id:
+        return jsonify({"msg": "Unauthorized"}), 403
+
+    # remove time slot from databse and return success status
+    db.session.delete(slot)
+    db.session.commit()
+
+    return jsonify({"msg": "Availability deleted successfully"}), 200
+    
 """
     this route serves the profile picture from the UPLOAD_FOLDER folder 
 
