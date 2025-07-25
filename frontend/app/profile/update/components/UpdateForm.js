@@ -122,7 +122,7 @@ export default function UpdateForm({ onSubmit, error, loading, initialData }) {
         />
       )}
       <div>
-        label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number (optional):</label>
+        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number (optional):</label>
         <input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
       </div>
       {error && <p className="text-red-500 text-sm text-center">{error}</p>}
