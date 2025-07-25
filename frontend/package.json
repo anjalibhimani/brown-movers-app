@@ -13,7 +13,8 @@
     "axios": "^1.x",
     "next": "14.x",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-calendar": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
