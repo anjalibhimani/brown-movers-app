@@ -37,6 +37,21 @@ class User(db.Model):
     profile_picture = db.Column(db.String(255), nullable=True)  # New field for profile picture
     phone_number = db.Column(db.String(20), nullable=True)
 
+class Availability(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
+    user = db.relationship('User', backref=db.backref('availabilities', lazy=True, cascade="all, delete-orphan"))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'start_time': self.start_time.isoformat(),
+            'end_time': self.end_time.isoformat()
+        }
+        
     """
         this function serializes a User object into a dictionary
         
