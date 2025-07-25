@@ -1,5 +1,7 @@
 # display welcome page for logged-in users with links to view all movers, upadete profile, etc
 
+'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
