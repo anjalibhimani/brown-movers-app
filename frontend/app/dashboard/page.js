@@ -1,6 +1,9 @@
 # display welcome page for logged-in users with links to view all movers, upadete profile, etc
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 
 /**
  * renders main dashboard page for user once logged in, and provides links to navigate to other pages in the web app
@@ -8,7 +11,19 @@ import Link from 'next/link';
  * @returns {JSX.Element} - the rendered dashboard component
  */
 
-export default function Dashboard() {
+export default function Dashboard() 
+    const [user, setUser] = useState(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            setUser(JSON.parse(userData));
+        } else {
+            router.push('/login');
+        }
+    }, [router]);
+    
     return (
       <div className="p-8">
         <h1 className="text-3xl font-bold">Welcome to your Dashboard!</h1>
@@ -28,6 +43,15 @@ export default function Dashboard() {
                     Update Profile
                 </a>
             </Link>
+    
+            {/* only show this option if logged in user is a mover */}
+            {user && user.is_service_provider && (
+                <Link href="/profile/availability" legacyBehavior>
+                    <a className="inline-block py-3 px-6 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors">
+                        Manage My Availability
+                    </a>
+                </Link>
+            )}
         </div>
       </div>
     );
